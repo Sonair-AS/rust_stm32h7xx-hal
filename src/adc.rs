@@ -1,7 +1,7 @@
 //! Analog to Digital Converter (ADC)
 //!
 //! ADC1 and ADC2 share a reset line. To initialise both of them, use the
-//! [`adc12`](adc12) method.
+//! [`adc12`] method.
 //!
 //! # Examples
 //!
@@ -29,7 +29,10 @@ use crate::stm32::adc12_common::ccr::PRESC_A;
 #[cfg(not(feature = "rm0455"))]
 use crate::stm32::adc3_common::ccr::PRESC_A;
 
+#[cfg(feature = "rm0399")]
+use crate::gpio::Split;
 use crate::gpio::{self, Analog};
+
 use crate::pwr::{current_vos, VoltageScale};
 use crate::rcc::rec::AdcClkSelGetter;
 use crate::rcc::{rec, CoreClocks, ResetEnable};
@@ -89,7 +92,7 @@ pub enum AdcDmaMode {
 /// Options for the sampling time, each is T + 0.5 ADC clock cycles.
 //
 // Refer to RM0433 Rev 7 - Chapter 25.4.13
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(non_camel_case_types)]
 pub enum AdcSampleTime {
@@ -102,6 +105,7 @@ pub enum AdcSampleTime {
     /// 16.5 cycles sampling time
     T_16,
     /// 32.5 cycles sampling time
+    #[default]
     T_32,
     /// 64.5 cycles sampling time
     T_64,
@@ -111,11 +115,6 @@ pub enum AdcSampleTime {
     T_810,
 }
 
-impl Default for AdcSampleTime {
-    fn default() -> Self {
-        AdcSampleTime::T_32
-    }
-}
 impl AdcSampleTime {
     /// Returns the number of half clock cycles represented by this sampling time
     fn clock_cycles_x2(&self) -> u32 {
@@ -356,6 +355,13 @@ adc_pins!(ADC1,
     gpio::PA5<Analog> => 19,
 );
 
+#[cfg(feature = "rm0399")]
+adc_pins!(ADC1,
+    // 0, 1 are Pxy_C pins
+    gpio::PA0_C<Split> => 0,
+    gpio::PA1_C<Split> => 1,
+);
+
 adc_pins!(ADC2,
     // 0, 1 are Pxy_C pins
     gpio::PF13<Analog> => 2,
@@ -391,14 +397,6 @@ adc_internal!(
 #[cfg(any(feature = "rm0433", feature = "rm0399"))]
 adc_pins!(ADC3,
     // 0, 1 are Pxy_C pins
-
-    // EB: These two are a bit of "hack" (normally not supported by hal).
-    // EB: Requires the PC2/3_C to be connected. Should not be included in any patches...
-    // EB: Use these because they are faster and we then don't need to mess with syscfg
-    // EB: (on mainboard)
-    gpio::PC2<Analog> => 0, // Force PC2 to use channel 0 (PC2_C)
-    gpio::PC3<Analog> => 1, // Add PC3_C on channel 0
-
     gpio::PF9<Analog> => 2,
     gpio::PF7<Analog> => 3,
     gpio::PF5<Analog> => 4,
@@ -409,12 +407,21 @@ adc_pins!(ADC3,
     gpio::PF4<Analog> => 9,
     gpio::PC0<Analog> => 10,
     gpio::PC1<Analog> => 11,
-    //gpio::PC2<Analog> => 12,
+    gpio::PC2<Analog> => 12,
     gpio::PH2<Analog> => 13,
     gpio::PH3<Analog> => 14,
     gpio::PH4<Analog> => 15,
     gpio::PH5<Analog> => 16,
 );
+// EB: Todo: If we want to merge upstream, we need to figure out exactly which MCUs have these pins
+// EB: which is complicated as it depends on the package...
+#[cfg(feature = "rm0399")]
+adc_pins!(ADC3,
+    // 0, 1 are Pxy_C pins
+    gpio::PC2_C<Split> => 0,
+    gpio::PC3_C<Split> => 1,
+);
+
 #[cfg(any(feature = "rm0433", feature = "rm0399"))]
 adc_internal!(
     [ADC3, ADC3_COMMON];
@@ -446,6 +453,7 @@ adc_pins!(ADC3,
     // Although ADC3_INP16 appears in device datasheets (on PH5), RM0468 Rev 7
     // Figure 231 does not show ADC3_INP16
 );
+
 #[cfg(feature = "rm0468")]
 adc_internal!(
     [ADC3, ADC3_COMMON];
@@ -1216,7 +1224,7 @@ macro_rules! adc_hal {
 
                 /// Set ADC sampling time
                 ///
-                /// Options can be found in [AdcSampleTime](crate::adc::AdcSampleTime).
+                /// Options can be found in [AdcSampleTime].
                 pub fn set_sample_time(&mut self, t_samp: AdcSampleTime) {
                     self.sample_time = t_samp;
                 }
