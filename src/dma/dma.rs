@@ -14,6 +14,7 @@ use core::marker::PhantomData;
 use crate::{
     adc,
     adc::Adc,
+    dac::{self, C1, C2},
     i2c::I2c,
     pac::{self, DMA1, DMA2, DMAMUX1},
     rcc::{rec, rec::ResetEnable},
@@ -1177,3 +1178,31 @@ peripheral_target_address!((
     P2M,
     DMAReq::Adc3Dma
 ));
+
+// EM: 
+// Enable target address for DAC channel 1 and 2 specifically for 
+// 12-bit right-aligned data holding registers. This is the same registers as the default
+// DAC implementation.
+// The HAL isn't really made for devices with multiple channels that share an "inner_mut" location,
+// such as dma transfers to Channel 1 and Channel 2 dma, which share config registers.
+// We will (and should) probably only use one DAC channel to make sure we don't get tricked by the
+// compiler thinking the memory isn't shared.
+unsafe impl TargetAddress<M2P> for C1<pac::DAC, dac::Enabled> {
+    #[inline(always)]
+    fn address(&self) -> usize {
+        let dac: &crate::pac::dac::RegisterBlock = unsafe { &*pac::DAC::ptr() };
+        &dac.dhr12r1 as *const _ as usize
+    }
+    type MemSize = u16;
+    const REQUEST_LINE: Option<u8> = Some((DMAReq::DacCh1Dma) as u8);
+}
+
+unsafe impl TargetAddress<M2P> for C2<pac::DAC, dac::Enabled> {
+    #[inline(always)]
+    fn address(&self) -> usize {
+        let dac: &crate::pac::dac::RegisterBlock = unsafe { &*pac::DAC::ptr() };
+        &dac.dhr12r2 as *const _ as usize
+    }
+    type MemSize = u16;
+    const REQUEST_LINE: Option<u8> = Some((DMAReq::DacCh2Dma) as u8);
+}

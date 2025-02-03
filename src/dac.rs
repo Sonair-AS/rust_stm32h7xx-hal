@@ -160,6 +160,21 @@ macro_rules! dac {
                     _enabled: PhantomData,
                 }
             }
+
+            pub fn modify_inner<F>(&mut self, f: F)
+            where
+                F: FnOnce(&crate::pac::dac::RegisterBlock),
+            {
+                let dac = unsafe { &(*$DAC::ptr()) };
+                f(dac)
+            }
+
+            // Helper method for viewing the DMA target register. Useful to check if DMA is running
+            // and moving data to the correct place.
+            pub fn read_output_reg(&mut self) -> u32 {
+                let dac = unsafe { &(*$DAC::ptr()) };
+                dac.dhr12r2.read().bits() as u32
+            }
         }
 
         /// DacOut implementation available in any Enabled/Disabled state
