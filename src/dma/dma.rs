@@ -1179,14 +1179,13 @@ peripheral_target_address!((
     DMAReq::Adc3Dma
 ));
 
-// EM: 
-// Enable target address for DAC channel 1 and 2 specifically for 
-// 12-bit right-aligned data holding registers. This is the same registers as the default
-// DAC implementation.
+// EM:
+// Enable target address for DAC channel 1 and 2 specifically for 12-bit right-aligned data holding
+// registers. This is the same registers as the default DAC implementation.
 // The HAL isn't really made for devices with multiple channels that share an "inner_mut" location,
-// such as dma transfers to Channel 1 and Channel 2 dma, which share config registers.
-// We will (and should) probably only use one DAC channel to make sure we don't get tricked by the
-// compiler thinking the memory isn't shared.
+// such as dma transfers to Channel 1 and Channel 2 dma, which share config registers. We will (and
+// should) probably only use one DAC channel to make sure we don't get tricked by the compiler
+// thinking the memory isn't shared.
 unsafe impl TargetAddress<M2P> for C1<pac::DAC, dac::Enabled> {
     #[inline(always)]
     fn address(&self) -> usize {
