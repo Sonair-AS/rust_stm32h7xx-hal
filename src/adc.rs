@@ -29,7 +29,7 @@ use crate::stm32::adc12_common::ccr::PRESC_A;
 #[cfg(not(feature = "rm0455"))]
 use crate::stm32::adc3_common::ccr::PRESC_A;
 
-#[cfg(feature = "rm0399")]
+#[cfg(any(feature = "rm0433", feature = "rm0399"))]
 use crate::gpio::Split;
 use crate::gpio::{self, Analog};
 
@@ -355,7 +355,7 @@ adc_pins!(ADC1,
     gpio::PA5<Analog> => 19,
 );
 
-#[cfg(feature = "rm0399")]
+#[cfg(any(feature = "rm0433", feature = "rm0399"))]
 adc_pins!(ADC1,
     // 0, 1 are Pxy_C pins
     gpio::PA0_C<Split> => 0,
@@ -415,7 +415,7 @@ adc_pins!(ADC3,
 );
 // EB: Todo: If we want to merge upstream, we need to figure out exactly which MCUs have these pins
 // EB: which is complicated as it depends on the package...
-#[cfg(feature = "rm0399")]
+#[cfg(any(feature = "rm0433", feature = "rm0399"))]
 adc_pins!(ADC3,
     // 0, 1 are Pxy_C pins
     gpio::PC2_C<Split> => 0,
