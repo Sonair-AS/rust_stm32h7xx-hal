@@ -160,6 +160,13 @@ macro_rules! dac {
                     _enabled: PhantomData,
                 }
             }
+
+            // The dac channels cannot own their own inner peripheral as it is shared between
+            // channels. Instead fetch it directly.
+            pub fn inner(&self) -> &crate::pac::dac::RegisterBlock {
+                let dac = unsafe { &(*$DAC::ptr()) };
+                dac
+            }
         }
 
         /// DacOut implementation available in any Enabled/Disabled state
