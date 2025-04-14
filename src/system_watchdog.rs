@@ -55,6 +55,11 @@ impl SystemWindowWatchdog {
     /// to indicate the clock has not been used yet
     pub fn new(wwdg: WWDG, ccdr: &Ccdr) -> Self {
         // enable the peripheral inside the APB3
+
+        // RM0433 8.7.44, ww1rsc must be set to 1 before setting wwdg1en to 1.
+        #[cfg(feature = "rm0433")]
+        ccdr.rb.gcr.modify(|_, w| w.ww1rsc().set());
+
         #[cfg(not(feature = "rm0455"))]
         ccdr.rb.apb3enr.modify(|_, w| w.wwdg1en().set_bit());
         #[cfg(feature = "rm0455")]
