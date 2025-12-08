@@ -168,7 +168,7 @@ pub mod dsi;
 pub mod ethernet;
 #[cfg(feature = "device-selected")]
 pub mod exti;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", not(feature = "certified_subset")))]
 pub mod flash;
 #[cfg(all(feature = "device-selected", feature = "fmc"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "fmc")))]

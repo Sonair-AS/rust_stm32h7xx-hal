@@ -11,6 +11,7 @@ pub use crate::crc::CrcExt as _stm32h7xx_hal_crc_CrcExt;
 pub use crate::dac::DacExt as _stm32h7xx_hal_dac_DacExt;
 pub use crate::delay::DelayExt as _stm32h7xx_hal_delay_DelayExt;
 pub use crate::exti::ExtiExt as _stm32h7xx_hal_delay_ExtiExt;
+#[cfg(not(feature = "certified_subset"))]
 pub use crate::flash::FlashExt as _stm32h7xx_hal_flash_FlashExt;
 #[cfg(feature = "fmc")]
 #[cfg_attr(docsrs, doc(cfg(feature = "fmc")))]
