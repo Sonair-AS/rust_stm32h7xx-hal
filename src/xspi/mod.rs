@@ -147,7 +147,8 @@ mod common {
     use core::{marker::PhantomData, ptr};
 
     /// Represents operation modes of the XSPI interface.
-    #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Copy, Clone, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub enum XspiMode {
         /// Only a single IO line (IO0) is used for transmit and a separate line
@@ -177,7 +178,8 @@ mod common {
         }
     }
     /// Indicates an error with the XSPI peripheral.
-    #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Copy, Clone, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub enum XspiError {
         Busy,
@@ -189,7 +191,8 @@ mod common {
     }
 
     /// Instruction, Address or Alternate Byte word used by the XSPI interface
-    #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Copy, Clone, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub enum XspiWord {
         None,
@@ -229,7 +232,8 @@ mod common {
     }
 
     /// Sampling mode for the XSPI interface
-    #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Copy, Clone, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub enum SamplingEdge {
         Falling,
@@ -249,7 +253,8 @@ mod common {
     }
 
     /// Indicates a specific QUADSPI bank to use.
-    #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Copy, Clone, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     #[cfg(any(feature = "rm0433", feature = "rm0399"))]
     pub enum Bank {
@@ -260,7 +265,8 @@ mod common {
     // Banks are not supported by the Octospi peripheral (there's two Octospi
     // peripherals instead)
 
-    #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Copy, Clone, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     #[cfg(any(feature = "rm0433", feature = "rm0399"))]
     pub enum BankError {
@@ -281,7 +287,8 @@ mod common {
     }
 
     /// Indicates one of the two existing QUADSPI bank.
-    #[derive(Debug, Copy, Clone, PartialEq, Eq)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Copy, Clone, PartialEq, Eq)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     #[cfg(any(feature = "rm0433", feature = "rm0399"))]
     pub enum BankSelect {
@@ -571,7 +578,7 @@ mod common {
                 self.rb.ccr.modify(|_, w| unsafe {
                     #[cfg(any(feature = "rm0433", feature = "rm0399"))]
                     let w = {
-                        let ir = instruction.bits_u8().unwrap();
+                        let ir = instruction.bits_u8().unwrap_or_else(|_| panic!("bits_u8 failed"));
                         w.dcyc().bits(dummy_cycles).instruction().bits(ir).fmode().bits(fmode)
                     };
 

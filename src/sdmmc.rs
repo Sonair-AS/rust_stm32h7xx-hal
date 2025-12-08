@@ -1123,7 +1123,7 @@ macro_rules! sdmmc {
 
                     // Set bus width
                     let (width, acmd_arg) = match self.bus_width {
-                        Buswidth::Eight => unimplemented!(),
+                        Buswidth::Eight => panic!(),
                         Buswidth::Four if card.scr.bus_width_four() => (Buswidth::Four, 2),
                         _ => (Buswidth::One, 0),
                     };
@@ -1519,7 +1519,7 @@ macro_rules! sdmmc {
                     let (hs_timing, ddr, bus_mode) = match signaling {
                         EmmcSignaling::HighSpeed => (1, false, width as u8),
                         EmmcSignaling::DDR52 => (1, true, 4 + width as u8),
-                        EmmcSignaling::HS200 => unimplemented!(),
+                        EmmcSignaling::HS200 => panic!(),
                         _ => (0, false, width as u8)
                     };
 

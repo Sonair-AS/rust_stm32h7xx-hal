@@ -135,7 +135,8 @@ impl WatchdogEnable for SystemWindowWatchdog {
     {
         let period_ms = period.into().ticks();
         let maximum =
-            (4096 * 2u32.pow(7) * 64) / (self.pclk3_frequency.raw() / 1000);
+            //(4096 * 2u32.pow(7) * 64) / (self.pclk3_frequency.raw() / 1000);
+            (4096 * 128u32 * 64) / (self.pclk3_frequency.raw() / 1000);
         assert!(period_ms <= maximum);
 
         // timeout = pclk * 4096 * 2^WDGTB[2:0] * (t[5:0] +1)
@@ -157,7 +158,7 @@ impl WatchdogEnable for SystemWindowWatchdog {
         let t = ratio / tb_div;
         assert!(t < 64);
 
-        self.down_counter = u8(t).unwrap() | (1 << 6);
+        self.down_counter = u8(t).unwrap_or_else(|_| panic!("timer to u8 conversion failed")) | (1 << 6);
 
         // write the config values, matching the set timeout the most
         self.wwdg.cfr.modify(|_, w| w.wdgtb().bits(wdgtb));

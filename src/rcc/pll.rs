@@ -142,14 +142,34 @@ macro_rules! vco_setup {
 
          // Iterative search for the lowest m value that minimizes
          // the difference between requested and actual VCO frequency
-         let pll_x_m = (pll_x_m_min..=pll_x_m_max).min_by_key(|pll_x_m| {
+         //let pll_x_m = (pll_x_m_min..=pll_x_m_max).min_by_key(|pll_x_m| {
+         //    let ref_x_ck = $pllsrc / pll_x_m;
+         //
+         //    // Feedback divider. Integer only
+         //    let pll_x_n = vco_ck_target / ref_x_ck;
+         //
+         //    vco_ck_target as i32 - (ref_x_ck * pll_x_n) as i32
+         //}).unwrap();
+
+         let mut min = None;
+         for pll_x_m in (pll_x_m_min..pll_x_m_max + 1) {
              let ref_x_ck = $pllsrc / pll_x_m;
 
              // Feedback divider. Integer only
              let pll_x_n = vco_ck_target / ref_x_ck;
 
-             vco_ck_target as i32 - (ref_x_ck * pll_x_n) as i32
-         }).unwrap();
+             let val = vco_ck_target as i32 - (ref_x_ck * pll_x_n) as i32;
+
+             if let Some((_, v_min)) = min {
+                 if val < v_min {
+                     min = Some((pll_x_m, val))
+                 }
+             } else {
+                 min = Some((pll_x_m, val))
+             }
+         };
+
+         let pll_x_m: u32 = min.unwrap_or_else(|| panic!("pll error")).0;
 
          assert!(pll_x_m < 64);
 

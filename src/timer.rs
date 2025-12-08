@@ -78,7 +78,7 @@ impl GetClk for LPTIM1 {
             Some(ccip2r::LPTIM1SEL_A::RccPclk1) => Some(clocks.pclk1()),
             Some(ccip2r::LPTIM1SEL_A::Pll2P) => clocks.pll2_p_ck(),
             Some(ccip2r::LPTIM1SEL_A::Pll3R) => clocks.pll3_r_ck(),
-            Some(ccip2r::LPTIM1SEL_A::Lse) => unimplemented!(),
+            Some(ccip2r::LPTIM1SEL_A::Lse) => panic!(),
             Some(ccip2r::LPTIM1SEL_A::Lsi) => clocks.lsi_ck(),
             Some(ccip2r::LPTIM1SEL_A::Per) => clocks.per_ck(),
             _ => unreachable!(),
@@ -100,7 +100,7 @@ impl GetClk for LPTIM2 {
             Some(srdccipr::LPTIM2SEL_A::RccPclk4) => Some(clocks.pclk4()),
             Some(srdccipr::LPTIM2SEL_A::Pll2P) => clocks.pll2_p_ck(),
             Some(srdccipr::LPTIM2SEL_A::Pll3R) => clocks.pll3_r_ck(),
-            Some(srdccipr::LPTIM2SEL_A::Lse) => unimplemented!(),
+            Some(srdccipr::LPTIM2SEL_A::Lse) => panic!(),
             Some(srdccipr::LPTIM2SEL_A::Lsi) => clocks.lsi_ck(),
             Some(srdccipr::LPTIM2SEL_A::Per) => clocks.per_ck(),
             _ => unreachable!(),
@@ -120,7 +120,7 @@ impl GetClk for LPTIM3 {
             0 => Some(clocks.pclk4()),
             1 => clocks.pll2_p_ck(),
             2 => clocks.pll3_r_ck(),
-            3 => unimplemented!(),
+            3 => panic!(),
             4 => clocks.lsi_ck(),
             5 => clocks.per_ck(),
             _ => unreachable!(),
@@ -143,7 +143,7 @@ macro_rules! impl_clk_lptim345 {
                         Some(srdccipr::LPTIM345SEL_A::RccPclk4) => Some(clocks.pclk4()),
                         Some(srdccipr::LPTIM345SEL_A::Pll2P) => clocks.pll2_p_ck(),
                         Some(srdccipr::LPTIM345SEL_A::Pll3R) => clocks.pll3_r_ck(),
-                        Some(srdccipr::LPTIM345SEL_A::Lse) => unimplemented!(),
+                        Some(srdccipr::LPTIM345SEL_A::Lse) => panic!(),
                         Some(srdccipr::LPTIM345SEL_A::Lsi) => clocks.lsi_ck(),
                         Some(srdccipr::LPTIM345SEL_A::Per) => clocks.per_ck(),
                         _ => unreachable!(),
@@ -190,7 +190,7 @@ pub trait TimerExt<TIM> {
 }
 
 /// Hardware timers
-#[derive(Debug)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Timer<TIM> {
     clk: u32,
@@ -266,7 +266,7 @@ pub trait HalEnabledLpTimer: HalLpTimer {
 }
 
 /// Low power hardware timers
-#[derive(Debug)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
 pub struct LpTimer<TIM, ED> {
     clk: u32,
     tim: TIM,
@@ -418,7 +418,7 @@ macro_rules! hal {
                         clk * timeout.as_secs() +
                         clk * u64::from(timeout.subsec_nanos()) / NANOS_PER_SECOND,
                     )
-                    .unwrap_or(u32::max_value());
+                    .unwrap_or(u32::MAX);
 
                     self.set_timeout_ticks(ticks.max(1));
                 }
@@ -451,7 +451,7 @@ macro_rules! hal {
                 pub fn set_tick_freq(&mut self, frequency: Hertz) {
                     let div = self.clk / frequency.raw();
 
-                    let psc = u16(div - 1).unwrap();
+                    let psc = u16(div - 1).unwrap_or_else(|_| panic!("set tick freq failed"));
                     self.tim.psc.write(|w| w.psc().bits(psc));
 
                     let counter_max = u32(<$cntType>::MAX);
@@ -565,9 +565,9 @@ macro_rules! hal {
 fn calculate_timeout_ticks_register_values(ticks: u32) -> (u16, u16) {
     // Note (unwrap): Never panics because 32-bit value is shifted right by 16 bits,
     // resulting in a value that always fits in 16 bits.
-    let psc = u16(ticks / (1 << 16)).unwrap();
+    let psc = u16(ticks / (1 << 16)).unwrap_or_else(|_| panic!(""));
     // Note (unwrap): Never panics because the divisor is always such that the result fits in 16 bits.
-    let arr = u16(ticks / (u32(psc) + 1)).unwrap();
+    let arr = u16(ticks / (u32(psc) + 1)).unwrap_or_else(|_| panic!(""));
     (psc, arr)
 }
 

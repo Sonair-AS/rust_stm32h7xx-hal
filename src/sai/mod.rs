@@ -89,7 +89,7 @@ macro_rules! impl_sai_ker_ck {
                                 concat!(stringify!($SAIX), " A: PLL3_P must be enabled")
                             )
                         }
-                        Some(rec::$AccessA::I2sCkin) => unimplemented!(),
+                        Some(rec::$AccessA::I2sCkin) => panic!(),
                         Some(rec::$AccessA::Per) => {
                             clocks.per_ck().expect(
                                 concat!(stringify!($SAIX), " A: PER clock must be enabled")
@@ -116,7 +116,7 @@ macro_rules! impl_sai_ker_ck {
                                 concat!(stringify!($SAIX), " B: PLL3_P must be enabled")
                             )
                         }
-                        Some(rec::$AccessB::I2sCkin) => unimplemented!(),
+                        Some(rec::$AccessB::I2sCkin) => panic!(),
                         Some(rec::$AccessB::Per) => {
                             clocks.per_ck().expect(
                                 concat!(stringify!($SAIX), " B: PER clock must be enabled")

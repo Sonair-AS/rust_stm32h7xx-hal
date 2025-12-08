@@ -21,7 +21,11 @@ pub trait Stream: Sealed {
     type Config;
 
     /// Structure representing interrupts
+    #[cfg(not(feature = "certified_subset"))]
     type Interrupts: Copy + Debug;
+
+    #[cfg(feature = "certified_subset")]
+    type Interrupts: Copy;
 
     /// Apply the configation structure to this stream.
     fn apply_config(&mut self, config: Self::Config);
@@ -187,6 +191,7 @@ pub trait DoubleBufferedStream: Stream + Sealed {
 
 /// Trait for Master DMA (MDMA) streams
 #[allow(unused)]
+#[cfg(not(feature = "certified_subset"))]
 pub trait MasterStream: Stream + Sealed {
     /// Set the source for the Master DMA stream
     ///

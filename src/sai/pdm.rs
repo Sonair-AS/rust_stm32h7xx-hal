@@ -223,7 +223,7 @@ macro_rules! hal {
                 {
                     let micnbr = match PINS::MAX_MICROPHONES {
                         2 => 0, // Up to 2 microphones
-                        _ => unimplemented!(),
+                        _ => panic!(),
                     };
                     let frl = (16 * (micnbr + 1)) - 1; // Frame length
                     let ds = 0b100; // 16 bits

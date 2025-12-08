@@ -229,7 +229,8 @@ pub struct ComplementaryDisabled;
 pub struct ComplementaryEnabled;
 
 /// Enum for IO polarity
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Polarity {
     ActiveHigh,
@@ -255,7 +256,8 @@ pub struct ActiveHigh;
 pub struct ActiveLow;
 
 /// Whether a PWM signal is left-aligned, right-aligned, or center-aligned
-#[derive(Copy, Clone, Debug)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Alignment {
     Left,

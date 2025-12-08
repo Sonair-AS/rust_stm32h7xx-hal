@@ -18,14 +18,19 @@ pub use crate::flash::FlashExt as _stm32h7xx_hal_flash_FlashExt;
 pub use crate::fmc::FmcExt as _stm32h7xx_hal_fmc_FmcExt;
 pub use crate::gpio::GpioExt as _stm32h7xx_hal_gpio_GpioExt;
 pub use crate::i2c::I2cExt as _stm32h7xx_hal_i2c_I2cExt;
+#[cfg(not(feature = "certified_subset"))]
 pub use crate::pwm::PwmAdvExt as _stm32_hal_pwm_PwmAdvExt;
+#[cfg(not(feature = "certified_subset"))]
 pub use crate::pwm::PwmExt as _stm32_hal_pwm_PwmExt;
 pub use crate::pwr::PwrExt as _stm32h7xx_hal_pwr_PwrExt;
 pub use crate::rcc::RccExt as _stm32h7xx_hal_rcc_RccExt;
 pub use crate::rng::RngCore as _stm32h7xx_hal_rng_RngCore;
 pub use crate::rng::RngExt as _stm32h7xx_hal_rng_RngExt;
+#[cfg(not(feature = "certified_subset"))]
 pub use crate::sai::SaiDmaExt as _stm32h7xx_hal_spi_SaiDmaExt;
+#[cfg(not(feature = "certified_subset"))]
 pub use crate::sai::SaiI2sExt as _stm32h7xx_hal_spi_SaiI2sExt;
+#[cfg(not(feature = "certified_subset"))]
 pub use crate::sai::SaiPdmExt as _stm32h7xx_hal_spi_SaiPdmExt;
 #[cfg(feature = "sdmmc")]
 #[cfg_attr(docsrs, doc(cfg(feature = "sdmmc")))]

@@ -18,8 +18,11 @@ use crate::{
     i2c::I2c,
     pac::{self, DMA1, DMA2, DMAMUX1},
     rcc::{rec, rec::ResetEnable},
-    sai, serial, spi,
+    serial, spi,
 };
+
+#[cfg(not(feature = "certified_subset"))]
+use crate::sai;
 
 use core::ops::Deref;
 
@@ -76,7 +79,8 @@ impl Instance for DMA2 {
 }
 
 /// DMA interrupts
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct DmaInterrupts {
     transfer_complete: bool,
@@ -87,7 +91,8 @@ pub struct DmaInterrupts {
 }
 
 /// Contains configuration for a DMA stream
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct DmaConfig {
     pub(crate) priority: config::Priority,
@@ -1048,6 +1053,7 @@ peripheral_target_address!(
     (HAL: I2c<pac::I2C3>, txdr, u8, M2P, DMAReq::I2c3TxDma),
 );
 
+#[cfg(not(feature = "certified_subset"))]
 peripheral_target_address!(
     // implementation on PAC types, fixed output Channel A and input Channel B
     (pac::SAI1, cha.dr, u32, M2P, DMAReq::Sai1aDma),
@@ -1082,6 +1088,7 @@ peripheral_target_address!(
         DMAReq::Sai1bDma
     ),
 );
+#[cfg(not(feature = "certified_subset"))]
 #[cfg(not(feature = "rm0468"))]
 peripheral_target_address!(
     // implementation on PAC types, fixed output Channel A and input Channel B
@@ -1118,6 +1125,7 @@ peripheral_target_address!(
     ),
 
 );
+#[cfg(not(feature = "certified_subset"))]
 #[cfg(any(feature = "rm0433", feature = "rm0399"))]
 peripheral_target_address!(
     // implementation on PAC types, fixed output Channel A and input Channel B

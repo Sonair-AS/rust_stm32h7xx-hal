@@ -185,6 +185,7 @@ pub mod ltdc;
 #[cfg(feature = "device-selected")]
 pub mod prelude;
 #[cfg(feature = "device-selected")]
+#[cfg(not(feature = "certified_subset"))]
 pub mod pwm;
 #[cfg(feature = "device-selected")]
 pub mod pwr;
@@ -198,6 +199,7 @@ pub mod rng;
 #[cfg_attr(docsrs, doc(cfg(feature = "rtc")))]
 pub mod rtc;
 #[cfg(feature = "device-selected")]
+#[cfg(not(feature = "certified_subset"))]
 pub mod sai;
 #[cfg(all(feature = "device-selected", feature = "sdmmc"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "sdmmc")))]
@@ -228,6 +230,7 @@ mod sealed {
 #[cfg(feature = "device-selected")]
 pub(crate) use sealed::Sealed;
 
+#[cfg(not(feature = "certified_subset"))]
 fn stripped_type_name<T>() -> &'static str {
     let s = core::any::type_name::<T>();
     let p = s.split("::");

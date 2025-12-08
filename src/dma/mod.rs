@@ -88,9 +88,13 @@
 //! Adapted from
 //! <https://github.com/stm32-rs/stm32f4xx-hal/blob/master/src/dma/mod.rs>
 
+#[cfg(not(feature = "certified_subset"))]
+use core::fmt::Debug;
+
+#[cfg(not(feature = "certified_subset"))]
+use core::cmp;
+
 use core::{
-    cmp,
-    fmt::Debug,
     marker::PhantomData,
     mem,
     ops::Not,
@@ -102,8 +106,11 @@ use embedded_dma::{ReadBuffer, WriteBuffer};
 
 use traits::{
     sealed::Bits, Direction, DoubleBufferedConfig, DoubleBufferedStream,
-    MasterStream, Stream, TargetAddress,
+    Stream, TargetAddress,
 };
+
+#[cfg(not(feature = "certified_subset"))]
+use traits::MasterStream;
 
 #[macro_use]
 mod macros;
@@ -112,13 +119,16 @@ mod macros;
 #[allow(clippy::module_inception)]
 pub mod dma; // DMA1 and DMA2
 
+#[cfg(not(feature = "certified_subset"))]
 pub mod bdma;
+#[cfg(not(feature = "certified_subset"))]
 pub mod mdma;
 
 pub mod traits;
 
 /// Errors.
-#[derive(PartialEq, Eq, Debug, Copy, Clone)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DMAError {
     /// DMA not ready to change buffers.
@@ -130,7 +140,8 @@ pub enum DMAError {
 }
 
 /// Possible DMA's directions.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DmaDirection {
     /// Memory to Memory transfer.
@@ -142,7 +153,8 @@ pub enum DmaDirection {
 }
 
 /// DMA from a peripheral to a memory location.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct PeripheralToMemory;
 
@@ -157,7 +169,8 @@ impl Direction for PeripheralToMemory {
 }
 
 /// DMA from one memory location to another memory location.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct MemoryToMemory<T> {
     _data: PhantomData<T>,
@@ -174,7 +187,8 @@ impl<T> Direction for MemoryToMemory<T> {
 }
 
 /// DMA from a memory location to a peripheral.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct MemoryToPeripheral;
 
@@ -189,27 +203,28 @@ impl Direction for MemoryToPeripheral {
 
 unsafe impl TargetAddress<Self> for MemoryToMemory<u8> {
     fn address(&self) -> usize {
-        unimplemented!()
+        panic!()
     }
     type MemSize = u8;
 }
 
 unsafe impl TargetAddress<Self> for MemoryToMemory<u16> {
     fn address(&self) -> usize {
-        unimplemented!()
+        panic!()
     }
     type MemSize = u16;
 }
 
 unsafe impl TargetAddress<Self> for MemoryToMemory<u32> {
     fn address(&self) -> usize {
-        unimplemented!()
+        panic!()
     }
     type MemSize = u32;
 }
 
 /// How full the DMA stream's fifo is.
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum FifoLevel {
     /// 0 < fifo_level < 1/4.
@@ -243,7 +258,8 @@ impl From<u8> for FifoLevel {
 }
 
 /// Which DMA buffer is in use.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum CurrentBuffer {
     /// The first buffer (m0ar).
@@ -272,7 +288,8 @@ pub mod config {
     /// the same software priority level, the stream with the lower number takes
     /// priority over the stream with the higher number. For example, Stream 2
     /// takes priority over Stream 4.
-    #[derive(Default, Debug, Clone, Copy)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Default, Clone, Copy)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub enum Priority {
         /// Low priority.
@@ -298,7 +315,8 @@ pub mod config {
     }
 
     /// The level to fill the fifo to before performing the transaction.
-    #[derive(Debug, Clone, Copy)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Clone, Copy)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub enum FifoThreshold {
         /// 1/4 full.
@@ -324,7 +342,8 @@ pub mod config {
 
     /// How burst transfers are done, requires fifo enabled. Check datasheet for
     /// valid combinations.
-    #[derive(Debug, Clone, Copy)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+    #[derive(Clone, Copy)]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub enum BurstMode {
         /// Single transfer, no burst.
@@ -369,7 +388,7 @@ pub struct MasterTransfer {
 
 // Marker type for a transfer with a constant source and backed by a
 // `MasterStream`
-// pub struct ConstMasterTransfer; UNIMPLEMENTED TODO
+// pub struct ConstMasterTransfer; panic TODO
 
 /// DMA Transfer.
 pub struct Transfer<STREAM, PERIPHERAL, DIR, BUF, TXFRT>
@@ -865,6 +884,7 @@ where
 
 // -------- MDMA --------
 
+#[cfg(not(feature = "certified_subset"))]
 impl<STREAM, PERIPHERAL, DIR, BUF, BUF_WORD>
     Transfer<STREAM, PERIPHERAL, DIR, BUF, MasterTransfer>
 where

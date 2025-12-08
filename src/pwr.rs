@@ -331,7 +331,7 @@ impl Pwr {
                     VoltageScale::Scale3 => 0b01,
                     VoltageScale::Scale2 => 0b10,
                     VoltageScale::Scale1 => 0b11,
-                    _ => unimplemented!(),
+                    _ => panic!(),
                 },
                 #[cfg(feature = "rm0455")]
                 match new_scale {

@@ -8,6 +8,7 @@
 //! - [Inverted Signal Levels](https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/serial-inverted-loopback.rs)
 
 use core::cell::UnsafeCell;
+#[cfg(not(feature = "certified_subset"))]
 use core::fmt;
 use core::marker::PhantomData;
 use core::ptr;
@@ -15,6 +16,7 @@ use core::ptr;
 use embedded_hal::blocking::serial as serial_block;
 use embedded_hal::prelude::*;
 use embedded_hal::serial;
+#[cfg(not(feature = "certified_subset"))]
 use nb::block;
 
 use stm32::usart1::cr2::{
@@ -40,7 +42,8 @@ use crate::stm32::{USART1, USART2, USART3, USART6};
 use crate::time::Hertz;
 
 /// Serial error
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[non_exhaustive]
 pub enum Error {
@@ -268,7 +271,7 @@ pub mod config {
         }
     }
 
-    #[derive(Debug)]
+    #[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
     #[cfg_attr(feature = "defmt", derive(defmt::Format))]
     pub struct InvalidConfig;
 
@@ -907,7 +910,7 @@ macro_rules! usart {
                 /// Combines the [`Tx`] and [`Rx`] structs from [`Serial::split()`] into a [`Serial`]
                 #[allow(unused_variables)]
                 pub fn join(tx: Tx<$USARTX>, rx: Rx<$USARTX>) -> Self {
-                    assert_eq!(core::mem::size_of::<$USARTX>(), 0);
+                    assert!(core::mem::size_of::<$USARTX>() == 0);
                     Self {
                         usart: unsafe { core::mem::zeroed::<$USARTX>() },
                         ker_ck: rx.ker_ck,
@@ -1180,7 +1183,7 @@ macro_rules! usart_sel {
                         Some($SEL::Pll3Q) => clocks.pll3_q_ck(),
                         Some($SEL::HsiKer) => clocks.hsi_ck(),
                         Some($SEL::CsiKer) => clocks.csi_ck(),
-                        Some($SEL::Lse) => unimplemented!(),
+                        Some($SEL::Lse) => panic!(),
                         _ => unreachable!(),
                     }
                 }
@@ -1216,7 +1219,7 @@ macro_rules! usart_sel {
                                 concat!(stringify!($USARTX), ": CSI clock must be enabled")
                             )
                         }
-                        Some($SEL::Lse) => unimplemented!(),
+                        Some($SEL::Lse) => panic!(),
                         _ => unreachable!(),
                     }
                 }
@@ -1295,6 +1298,7 @@ usart_sel! {
     UART7: "UART7",
 }
 
+#[cfg(not(feature = "certified_subset"))]
 impl<USART> fmt::Write for Tx<USART>
 where
     Tx<USART>: serial::Write<u8>,
@@ -1305,6 +1309,7 @@ where
     }
 }
 
+#[cfg(not(feature = "certified_subset"))]
 impl<USART> fmt::Write for Serial<USART>
 where
     Serial<USART>: serial::Write<u8>,

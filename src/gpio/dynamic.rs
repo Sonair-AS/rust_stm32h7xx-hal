@@ -24,7 +24,8 @@ pub enum Dynamic {
 }
 
 /// Error for [DynamicPin]
-#[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(PartialEq, Eq)]
 pub enum PinModeError {
     /// For operations unsupported in current mode
     IncorrectMode,

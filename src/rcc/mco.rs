@@ -78,7 +78,7 @@ impl Rcc {
     pub(super) fn mco1_setup(&mut self) {
         // HSI always runs
 
-        // LSE unimplemented
+        // LSE panic
 
         // HSE must be explicitly stated
         if self.config.mco1.source == MCO1::Hse {
@@ -137,7 +137,7 @@ impl Rcc {
 
         // CSI always runs
 
-        // LSI unimplemented
+        // LSI panic
     }
 }
 
@@ -164,7 +164,7 @@ macro_rules! mco1_setters {
 }
 mco1_setters! {
     mco1_from_hsi: Hsi "the HSI",
-    //mco1_from_lse: Lse "the LSE",    UNIMPLEMENTED
+    //mco1_from_lse: Lse "the LSE",    panic
     mco1_from_hse: Hse "the HSE",
     mco1_from_pll1_q_ck: Pll1Q "pll1_q_ck",
     mco1_from_hsi48: Hsi48 "HSI48"

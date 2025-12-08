@@ -85,7 +85,8 @@ use crate::stm32::{SPI1, SPI2, SPI3, SPI4, SPI5, SPI6};
 use crate::time::Hertz;
 
 /// SPI error
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[non_exhaustive]
 pub enum Error {
@@ -257,7 +258,8 @@ pub struct HardwareCS {
     pub polarity: Polarity,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum HardwareCSMode {
     /// Handling the CS is left for the user to do in software
@@ -522,7 +524,7 @@ pub enum Event {
     Error,
 }
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
 pub struct Spi<SPI, ED, WORD = u8> {
     spi: SPI,
     hardware_cs_mode: HardwareCSMode,
@@ -1038,9 +1040,8 @@ macro_rules! spi {
                         CONFIG: Into<Config>,
 	                {
                         let config = config.into();
-                        assert_eq!(
-                            config.hardware_cs.enabled(),
-                            PINS::HCS_PRESENT,
+                        assert!(
+                            config.hardware_cs.enabled() == PINS::HCS_PRESENT,
                             "If the hardware cs is enabled in the config, an HCS pin must be present in the given pins"
                         );
 	                    Spi::<$SPIX, Enabled, $TY>::$spiX(self, config, freq, prec, clocks)
@@ -1327,7 +1328,7 @@ macro_rules! spi123sel {
                         Some(ccip1r::SPI123SEL_A::Pll2P) => clocks.pll2_p_ck(),
                         Some(ccip1r::SPI123SEL_A::Pll3P) => clocks.pll3_p_ck(),
                         // Need a method of specifying pin clock
-                        Some(ccip1r::SPI123SEL_A::I2sCkin) => unimplemented!(),
+                        Some(ccip1r::SPI123SEL_A::I2sCkin) => panic!(),
                         Some(ccip1r::SPI123SEL_A::Per) => clocks.per_ck(),
                         _ => unreachable!(),
                     }
@@ -1355,7 +1356,7 @@ macro_rules! spi123sel {
                             clocks.pll3_p_ck().expect("SPI123: PLL3_P must be enabled")
                         }
                         // Need a method of specifying pin clock
-                        Some(ccip1r::SPI123SEL_A::I2sCkin) => unimplemented!(),
+                        Some(ccip1r::SPI123SEL_A::I2sCkin) => panic!(),
                         Some(ccip1r::SPI123SEL_A::Per) => {
                             clocks.per_ck().expect("SPI123: PER clock must be enabled")
                         }

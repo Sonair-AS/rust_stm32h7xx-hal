@@ -83,10 +83,11 @@ mod hal_02;
 
 pub use embedded_hal::digital::v2::PinState;
 
+#[cfg(not(feature = "certified_subset"))]
 use core::fmt;
 
 /// A filler pin type
-#[derive(Debug)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct NoPin;
 
@@ -150,7 +151,8 @@ pub struct Alternate<const A: u8, Otype = PushPull>(PhantomData<Otype>);
 pub struct Input;
 
 /// Pull setting for an input.
-#[derive(Debug, Eq, PartialEq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Pull {
     /// Floating
@@ -209,7 +211,8 @@ impl marker::NotAlt for Analog {}
 
 /// GPIO Pin speed selection
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Speed {
     /// Low speed
     Low = 0,
@@ -223,7 +226,8 @@ pub enum Speed {
 
 /// GPIO interrupt trigger edge selection
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Edge {
     /// Rising edge of voltage
     Rising,
@@ -297,6 +301,7 @@ impl<const P: char, const N: u8, MODE> Pin<P, N, MODE> {
     }
 }
 
+#[cfg(not(feature = "certified_subset"))]
 impl<const P: char, const N: u8, MODE> fmt::Debug for Pin<P, N, MODE> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_fmt(format_args!(

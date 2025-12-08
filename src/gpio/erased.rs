@@ -11,6 +11,7 @@ pub struct ErasedPin<MODE> {
     _mode: PhantomData<MODE>,
 }
 
+#[cfg(not(feature = "certified_subset"))]
 impl<MODE> fmt::Debug for ErasedPin<MODE> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_fmt(format_args!(

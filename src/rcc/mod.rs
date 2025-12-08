@@ -796,7 +796,7 @@ impl Rcc {
         let mco1_in = match self.config.mco1.source {
             // We set the required clock earlier, so can unwrap() here.
             MCO1::Hsi => HSI,
-            MCO1::Lse => unimplemented!(),
+            MCO1::Lse => panic!(),
             MCO1::Hse => self.config.hse.unwrap(),
             MCO1::Pll1Q => pll1_q_ck.unwrap().raw(),
             MCO1::Hsi48 => HSI48,

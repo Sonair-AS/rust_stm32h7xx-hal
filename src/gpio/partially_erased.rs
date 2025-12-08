@@ -20,6 +20,7 @@ impl<const P: char, MODE> PartiallyErasedPin<P, MODE> {
     }
 }
 
+#[cfg(not(feature = "certified_subset"))]
 impl<const P: char, MODE> fmt::Debug for PartiallyErasedPin<P, MODE> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_fmt(format_args!(

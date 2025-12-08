@@ -4,6 +4,7 @@
 //!
 //! - [CRC example](https://github.com/stm32-rs/stm32h7xx-hal/blob/master/examples/crc.rs)
 
+#[cfg(not(feature = "certified_subset"))]
 use core::fmt;
 
 use crate::rcc::{rec, ResetEnable};
@@ -59,14 +60,14 @@ impl Crc {
         // in the case of a single large slice this improves speed by >3x
         let mut words = data.chunks_exact(4);
         for word in words.by_ref() {
-            let word = u32::from_be_bytes(word.try_into().unwrap());
+            let word = u32::from_be_bytes(word.try_into().unwrap_or_else(|_| panic!("word to u32 failed")));
             self.reg.dr().write(|w| w.dr().bits(word));
         }
 
         // there will be at most 3 bytes remaining, so 1 half-word and 1 byte
         let mut half_word = words.remainder().chunks_exact(2);
         if let Some(half_word) = half_word.next() {
-            let half_word = u16::from_be_bytes(half_word.try_into().unwrap());
+            let half_word = u16::from_be_bytes(half_word.try_into().unwrap_or_else(|_| panic!("crc half word failed")));
             self.reg.dr16().write(|w| w.dr16().bits(half_word));
         }
 
@@ -169,7 +170,8 @@ mod macros {
 ///
 /// A polynomial being even means that the least significant bit is `0`
 /// in the polynomial's normal representation.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Polynomial(Poly);
 
@@ -261,7 +263,8 @@ impl Default for Polynomial {
 }
 
 /// Errors generated when trying to create invalid polynomials.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum PolynomialError {
     /// Tried to create an even polynomial.
@@ -272,6 +275,7 @@ pub enum PolynomialError {
     TooLarge,
 }
 
+#[cfg(not(feature = "certified_subset"))]
 impl fmt::Display for PolynomialError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
@@ -284,7 +288,8 @@ impl fmt::Display for PolynomialError {
 }
 
 /// Internal representation of a polynomial.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 enum Poly {
     /// 7-bit polynomial
@@ -302,7 +307,8 @@ enum Poly {
 /// ST refers to this as both 'reversal' and 'inversion'. If a CRC calls for
 /// 'reflection' it most likely wants [`BitReversal::Byte`] and output reversal
 /// enabled.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub enum BitReversal {
@@ -315,7 +321,9 @@ pub enum BitReversal {
 }
 
 /// CRC unit configuration.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, PartialEq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Eq))]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Config {
     poly: Polynomial,

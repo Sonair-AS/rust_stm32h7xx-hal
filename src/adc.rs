@@ -80,7 +80,8 @@ pub struct Adc<ADC, ED> {
 
 /// ADC DMA modes
 ///
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum AdcDmaMode {
     OneShot,
@@ -92,7 +93,8 @@ pub enum AdcDmaMode {
 /// Options for the sampling time, each is T + 0.5 ADC clock cycles.
 //
 // Refer to RM0433 Rev 7 - Chapter 25.4.13
-#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[allow(non_camel_case_types)]
 pub enum AdcSampleTime {
@@ -149,7 +151,8 @@ impl From<AdcSampleTime> for u8 {
 }
 
 /// The place in the sequence a given channel should be captured
-#[derive(Debug, PartialEq, PartialOrd, Copy, Clone)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(PartialEq, PartialOrd, Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Sequence {
     /// 1
@@ -228,7 +231,7 @@ impl From<u8> for Sequence {
             13 => Sequence::Fourteen,
             14 => Sequence::Fifteen,
             15 => Sequence::Sixteen,
-            _ => unimplemented!(),
+            _ => panic!(),
         }
     }
 }
@@ -236,7 +239,8 @@ impl From<u8> for Sequence {
 /// ADC LSHIFT\[3:0\] of the converted value
 ///
 /// Only values in range of 0..=15 are allowed.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct AdcLshift(u8);
 
@@ -254,7 +258,8 @@ impl AdcLshift {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct AdcCalOffset(u16);
 
@@ -264,7 +269,8 @@ impl AdcCalOffset {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct AdcCalLinear([u32; 6]);
 
@@ -476,7 +482,8 @@ pub trait AdcExt<ADC>: Sized {
 }
 
 /// Stored ADC config can be restored using the `Adc::restore_cfg` method
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone, PartialEq)]
 pub struct StoredConfig(AdcSampleTime, Resolution, AdcLshift);
 
 #[cfg(feature = "defmt")]
@@ -1005,7 +1012,7 @@ macro_rules! adc_hal {
                         16 => self.rb.smpr2.modify(|_, w| w.smp16().bits(st) ),
                         17 => self.rb.smpr2.modify(|_, w| w.smp17().bits(st) ),
                         18 => self.rb.smpr2.modify(|_, w| w.smp18().bits(st) ),
-                        _ => unimplemented!(),
+                        _ => panic!(),
                     }
 
                     // Select channel (with preselection, refer to RM0433 Rev 7 - Chapter 25.4.12)
@@ -1346,7 +1353,7 @@ macro_rules! adc_hal {
 
                 fn read(&mut self, pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
                     self.start_conversion(pin);
-                    let res = block!(self.read_sample()).unwrap();
+                    let res = block!(self.read_sample()).unwrap_or_else(|_| panic!("oneshot adc failed"));
                     Ok(res.into())
                 }
             }

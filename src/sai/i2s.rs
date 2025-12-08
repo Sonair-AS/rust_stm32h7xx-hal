@@ -74,7 +74,8 @@ pub enum I2SSync {
     External = 0b10,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum I2SError {
     NoChannelAvailable,

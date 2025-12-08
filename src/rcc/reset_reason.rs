@@ -1,6 +1,7 @@
 //! A module that can capture the RCC registers and read the reason why the mcu
 //! has reset
 
+#[cfg(not(feature = "certified_subset"))]
 use core::fmt::Display;
 
 /// Gets and clears the reason of why the mcu was reset
@@ -105,7 +106,8 @@ pub fn get_reset_reason(rcc: &mut crate::stm32::RCC) -> ResetReason {
 }
 
 /// Gives the reason why the mcu was reset
-#[derive(Debug, Copy, Clone)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Copy, Clone)]
 pub enum ResetReason {
     /// The mcu went from not having power to having power and resetting
     PowerOnReset,
@@ -136,6 +138,7 @@ pub enum ResetReason {
     },
 }
 
+#[cfg(not(feature = "certified_subset"))]
 impl Display for ResetReason {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {

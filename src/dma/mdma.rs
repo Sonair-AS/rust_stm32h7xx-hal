@@ -94,7 +94,8 @@ impl Instance for MDMA {
 }
 
 /// MDMA Stream Transfer Requests
-#[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum MdmaTransferRequest {
     Dma1Tcif0 = 0,
@@ -253,6 +254,7 @@ impl From<usize> for MdmaBurstSize {
         Self::from_size(v)
     }
 }
+#[cfg(not(feature = "certified_subset"))]
 impl fmt::Debug for MdmaBurstSize {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.0 > 0 {

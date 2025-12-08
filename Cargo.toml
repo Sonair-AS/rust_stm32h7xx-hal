@@ -28,7 +28,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 fugit = { git = "https://github.com/Sonair-AS/fugit.git", branch = "certified_subset_0.3.7" }
-embedded-hal = { package = "embedded-hal", path = "/home/even/git/embedded-hal/", features = [ "unproven", ] }
+embedded-hal = { package = "embedded-hal", git = "https://github.com/Sonair-AS/embedded-hal.git", branch = "certified_subset_v0.2.7", features = [ "unproven", ] }
 embedded-dma = "0.2.0"
 cortex-m = { git = "https://github.com/Sonair-AS/cortex-m.git", branch = "certified_subset", package = "cortex-m", features = [
     "critical-section-single-core",

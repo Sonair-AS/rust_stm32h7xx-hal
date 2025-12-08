@@ -13,7 +13,7 @@ use crate::rcc::{CoreClocks, ResetEnable};
 use crate::stm32::RNG;
 use crate::time::Hertz;
 
-#[derive(Debug)]
+#[cfg_attr(not(feature = "certified_subset"), derive(Debug))]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ErrorKind {
     ClockError = 0,
@@ -38,7 +38,7 @@ impl KerClk for RNG {
             RngClkSel::Pll1Q => {
                 clocks.pll1_q_ck().expect("RNG: PLL1_Q must be enabled")
             }
-            RngClkSel::Lse => unimplemented!(),
+            RngClkSel::Lse => panic!(),
             RngClkSel::Lsi => {
                 clocks.lsi_ck().expect("RNG: LSI must be enabled")
             }
