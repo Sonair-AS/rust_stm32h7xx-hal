@@ -89,7 +89,7 @@ otm8009a = "0.1"
 eg-seven-segment = "0.2.0"
 
 [features]
-default = ["rt"]
+default = ["rt", "impl-debug-pac"]
 device-selected = []
 revision_v = []
 rm0433 = ["gpio-h747"]          # aka. "single core" devices
@@ -137,6 +137,7 @@ log-semihost = []
 example-smps = []
 example-ldo = []
 
+impl-debug-pac = ["stm32h7/impl-debug"]
 certified_subset = [
     "embedded-hal/certified_subset",
     # "embedded-hal-nb/certified_subset",
