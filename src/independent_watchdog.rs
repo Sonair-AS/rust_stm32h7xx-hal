@@ -153,7 +153,11 @@ impl IndependentWatchdog {
             cortex_m::asm::nop();
         }
 
-        self.feed();
+        // Only feed the watchdog if no window value has been set.
+        // If window is set this will cause an immediate reset
+        if window_value == 0 {
+            self.feed();
+        }
     }
 
     /// Start the watchdog with the given max time and no minimal time
