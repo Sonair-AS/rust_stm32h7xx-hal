@@ -221,6 +221,7 @@ macro_rules! d3cr {
 }
 
 /// Returns the voltage scale at the current moment
+#[cfg(feature = "adc")]
 pub(crate) fn current_vos() -> VoltageScale {
     // NOTE(unsafe): Read-only access
     #[cfg(all(

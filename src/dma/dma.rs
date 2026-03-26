@@ -11,17 +11,22 @@ use super::{
 };
 use core::marker::PhantomData;
 
+#[cfg(feature = "dac")]
+use crate::dac::{self, C1, C2};
+#[cfg(feature = "i2c")]
+use crate::i2c::I2c;
+#[cfg(feature = "adc")]
+use crate::{adc, adc::Adc};
 use crate::{
-    adc,
-    adc::Adc,
-    dac::{self, C1, C2},
-    i2c::I2c,
     pac::{self, DMA1, DMA2, DMAMUX1},
     rcc::{rec, rec::ResetEnable},
-    serial, spi,
 };
+#[cfg(feature = "serial")]
+use crate::serial;
+#[cfg(feature = "spi")]
+use crate::spi;
 
-#[cfg(not(feature = "certified_subset"))]
+#[cfg(all(not(feature = "certified_subset"), feature = "sai"))]
 use crate::sai;
 
 use core::ops::Deref;
@@ -925,6 +930,7 @@ pub type DMAReq = pac::dmamux1::ccr::DMAREQ_ID_A;
 type P2M = PeripheralToMemory;
 type M2P = MemoryToPeripheral;
 
+#[cfg(feature = "spi")]
 peripheral_target_address!(
     (
         SPI: pac::SPI1,
@@ -968,6 +974,7 @@ peripheral_target_address!(
     )
 );
 
+#[cfg(feature = "serial")]
 peripheral_target_address!(
     (
         SERIAL: pac::USART1,
@@ -1026,7 +1033,7 @@ peripheral_target_address!(
         DMAReq::Uart8TxDma
     ),
 );
-#[cfg(any(feature = "rm0455", feature = "rm0468"))]
+#[cfg(all(feature = "serial", any(feature = "rm0455", feature = "rm0468")))]
 peripheral_target_address!(
     (
         SERIAL: pac::UART9,
@@ -1044,6 +1051,7 @@ peripheral_target_address!(
     ),
 );
 
+#[cfg(feature = "i2c")]
 peripheral_target_address!(
     (HAL: I2c<pac::I2C1>, rxdr, u8, P2M, DMAReq::I2c1RxDma),
     (HAL: I2c<pac::I2C1>, txdr, u8, M2P, DMAReq::I2c1TxDma),
@@ -1053,7 +1061,7 @@ peripheral_target_address!(
     (HAL: I2c<pac::I2C3>, txdr, u8, M2P, DMAReq::I2c3TxDma),
 );
 
-#[cfg(not(feature = "certified_subset"))]
+#[cfg(all(not(feature = "certified_subset"), feature = "sai"))]
 peripheral_target_address!(
     // implementation on PAC types, fixed output Channel A and input Channel B
     (pac::SAI1, cha.dr, u32, M2P, DMAReq::Sai1aDma),
@@ -1088,7 +1096,7 @@ peripheral_target_address!(
         DMAReq::Sai1bDma
     ),
 );
-#[cfg(not(feature = "certified_subset"))]
+#[cfg(all(not(feature = "certified_subset"), feature = "sai"))]
 #[cfg(not(feature = "rm0468"))]
 peripheral_target_address!(
     // implementation on PAC types, fixed output Channel A and input Channel B
@@ -1125,7 +1133,7 @@ peripheral_target_address!(
     ),
 
 );
-#[cfg(not(feature = "certified_subset"))]
+#[cfg(all(not(feature = "certified_subset"), feature = "sai"))]
 #[cfg(any(feature = "rm0433", feature = "rm0399"))]
 peripheral_target_address!(
     // implementation on PAC types, fixed output Channel A and input Channel B
@@ -1178,7 +1186,7 @@ peripheral_target_address!(
         DMAReq::Adc2Dma
     )
 );
-#[cfg(not(feature = "rm0455"))]
+#[cfg(all(feature = "adc", not(feature = "rm0455")))]
 peripheral_target_address!((
     HAL: Adc<pac::ADC3, adc::Enabled>,
     dr,
@@ -1194,6 +1202,7 @@ peripheral_target_address!((
 // such as dma transfers to Channel 1 and Channel 2 dma, which share config registers. We will (and
 // should) probably only use one DAC channel to make sure we don't get tricked by the compiler
 // thinking the memory isn't shared.
+#[cfg(feature = "dac")]
 unsafe impl TargetAddress<M2P> for C1<pac::DAC, dac::Enabled> {
     #[inline(always)]
     fn address(&self) -> usize {
@@ -1204,6 +1213,7 @@ unsafe impl TargetAddress<M2P> for C1<pac::DAC, dac::Enabled> {
     const REQUEST_LINE: Option<u8> = Some((DMAReq::DacCh1Dma) as u8);
 }
 
+#[cfg(feature = "dac")]
 unsafe impl TargetAddress<M2P> for C2<pac::DAC, dac::Enabled> {
     #[inline(always)]
     fn address(&self) -> usize {

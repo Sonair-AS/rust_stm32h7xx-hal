@@ -266,6 +266,7 @@ pub struct Ccdr {
     //
     // TODO: Remove this once all permitted RCC register accesses
     // after freeze are enumerated in this struct
+    #[allow(dead_code)]
     pub(crate) rb: RCC,
 }
 

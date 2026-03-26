@@ -111,8 +111,8 @@ pub use stm32h7::stm32h753v as stm32;
 // Dual core
 #[cfg(feature = "stm32h747cm7")]
 pub use stm32h7::stm32h747cm7 as stm32;
-#[cfg(feature = "stm32h757cm7")]
-pub use stm32h7::stm32h757cm7 as stm32;
+//#[cfg(feature = "stm32h757cm7")]
+//pub use stm32h7::stm32h757cm7 as stm32;
 // TODO(rm0399): soundness of PeripheralREC macro in rcc/rec.rs
 
 // High Memory Integration
@@ -143,7 +143,7 @@ pub use crate::stm32 as device;
 #[cfg_attr(docsrs, doc(cfg(feature = "rt")))]
 pub use crate::stm32::interrupt;
 
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "adc"))]
 pub mod adc;
 #[cfg(all(feature = "device-selected", feature = "can"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "can")))]
@@ -151,11 +151,11 @@ pub mod can;
 #[cfg(all(feature = "device-selected", feature = "crc"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "crc")))]
 pub mod crc;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "dac"))]
 pub mod dac;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "delay"))]
 pub mod delay;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "dma"))]
 pub mod dma;
 #[cfg(all(feature = "device-selected", feature = "dsi", feature = "rm0399"))]
 pub mod dsi;
@@ -166,55 +166,53 @@ pub mod dsi;
 ))]
 #[cfg_attr(docsrs, doc(cfg(feature = "ethernet")))]
 pub mod ethernet;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "exti"))]
 pub mod exti;
-//#[cfg(all(feature = "device-selected", not(feature = "certified_subset")))]
-//pub mod flash;
+#[cfg(all(feature = "device-selected", feature = "flash"))]
+pub mod flash;
 #[cfg(all(feature = "device-selected", feature = "fmc"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "fmc")))]
 pub mod fmc;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "gpio"))]
 pub mod gpio;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "i2c"))]
 pub mod i2c;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "independent_watchdog"))]
 pub mod independent_watchdog;
 #[cfg(all(feature = "device-selected", feature = "ltdc"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "ltdc")))]
 pub mod ltdc;
 #[cfg(feature = "device-selected")]
 pub mod prelude;
-#[cfg(feature = "device-selected")]
-#[cfg(not(feature = "certified_subset"))]
+#[cfg(all(feature = "device-selected", feature = "pwm"))]
 pub mod pwm;
 #[cfg(feature = "device-selected")]
 pub mod pwr;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "qei"))]
 pub mod qei;
 #[cfg(feature = "device-selected")]
 pub mod rcc;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "rng"))]
 pub mod rng;
 #[cfg(all(feature = "device-selected", feature = "rtc"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "rtc")))]
 pub mod rtc;
-#[cfg(feature = "device-selected")]
-#[cfg(not(feature = "certified_subset"))]
+#[cfg(all(feature = "device-selected", feature = "sai"))]
 pub mod sai;
 #[cfg(all(feature = "device-selected", feature = "sdmmc"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "sdmmc")))]
 pub mod sdmmc;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "serial"))]
 pub mod serial;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "signature"))]
 pub mod signature;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "spi"))]
 pub mod spi;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "system_watchdog"))]
 pub mod system_watchdog;
 #[cfg(feature = "device-selected")]
 pub mod time;
-#[cfg(feature = "device-selected")]
+#[cfg(all(feature = "device-selected", feature = "timer"))]
 pub mod timer;
 #[cfg(all(feature = "device-selected", feature = "usb_hs"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "usb_hs")))]
@@ -224,13 +222,16 @@ pub mod usb_hs;
 pub mod xspi;
 
 #[cfg(feature = "device-selected")]
+#[allow(unused)]
 mod sealed {
     pub trait Sealed {}
 }
 #[cfg(feature = "device-selected")]
+#[allow(unused)]
 pub(crate) use sealed::Sealed;
 
 #[cfg(not(feature = "certified_subset"))]
+#[allow(unused)]
 fn stripped_type_name<T>() -> &'static str {
     let s = core::any::type_name::<T>();
     let p = s.split("::");

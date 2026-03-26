@@ -12,11 +12,11 @@ use super::{
 };
 use core::marker::PhantomData;
 
+#[cfg(feature = "i2c")]
+use crate::i2c::I2c;
 use crate::{
-    i2c::I2c,
     pac,
     rcc::{rec, rec::ResetEnable},
-    //serial::{Rx, Tx},
     spi,
 };
 
@@ -755,7 +755,10 @@ peripheral_target_address!(
         [u8, u16],
         DMAReq::Spi6RxDma,
         DMAReq::Spi6TxDma
-    ),
+    )
+);
+#[cfg(feature = "i2c")]
+peripheral_target_address!(
     (HAL: I2c<pac::I2C4>, rxdr, u8, P2M, DMAReq::I2c4RxDma),
     (HAL: I2c<pac::I2C4>, txdr, u8, M2P, DMAReq::I2c4TxDma),
 );
