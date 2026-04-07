@@ -29,7 +29,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [dependencies]
 fugit = { git = "https://github.com/Sonair-AS/fugit.git", branch = "certified_subset_0.3.7" }
 embedded-hal = { package = "embedded-hal", git = "https://github.com/Sonair-AS/embedded-hal.git", branch = "certified_subset_v0.2.7", features = [ "unproven", ] }
-embedded-dma = "0.2.0"
+embedded-dma = { git = "https://github.com/Sonair-AS/embedded-dma.git", branch = "certified_subset" }
 cortex-m = { git = "https://github.com/Sonair-AS/cortex-m.git", branch = "certified_subset", package = "cortex-m", features = [
     "critical-section-single-core",
     "certified_subset",
@@ -39,7 +39,7 @@ stm32h7 = { git = "https://github.com/Sonair-AS/stm32h7-pac.git", default-featur
 void = { git = "https://github.com/Sonair-AS/rust-void.git", branch = "certified_subset", default-features = false }
 cast = { git = "https://github.com/Sonair-AS/cast.rs.git", branch = "certified_subset", default-features = false }
 nb = { git = "https://github.com/Sonair-AS/nb.git", branch = "certified_subset" }
-paste = "1.0.1"
+paste = { git = "https://github.com/Sonair-AS/paste.git", branch = "certified_subset" }
 bare-metal = { git = "https://github.com/Sonair-AS/bare-metal.git", branch = "certified_subset" }
 sdio-host = { version = "0.9", optional = true }
 embedded-sdmmc = { version = "0.5", optional = true }
