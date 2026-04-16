@@ -75,6 +75,10 @@ where
     // Enable DAC clocks and reset
     let _ = prec.enable().reset(); // drop, can be recreated by free method
 
+    // `clippy::uninit_assumed_init` warns on any `MaybeUninit::assume_init` because it is
+    // unsound for types that need a valid bit pattern. Here `PINS::Output` is always `C1`,
+    // `C2`, or `(C1, C2)`, which only contain `PhantomData` (ZST); there is no uninitialized
+    // memory and no invariant to establish.
     #[allow(clippy::uninit_assumed_init)]
     unsafe {
         MaybeUninit::uninit().assume_init()

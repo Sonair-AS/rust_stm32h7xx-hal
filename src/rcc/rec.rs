@@ -78,6 +78,13 @@ use cortex_m::interrupt;
 
 /// A trait for Resetting, Enabling and Disabling a single peripheral
 pub trait ResetEnable {
+    // `clippy::return_self_not_must_use` on enable/disable/reset: Clippy wants
+    // `#[must_use]` on methods that return `Self` so the result is not dropped by mistake.
+    // These return the moved REC handle only for fluent chaining (see examples above,
+    // e.g. `.enable().reset()`). Implementations return `self` after RCC side effects;
+    // we keep the trait surface free of `#[must_use]` rather than duplicating that
+    // attribute on every generated impl.
+
     /// Enable this peripheral
     #[allow(clippy::return_self_not_must_use)]
     fn enable(self) -> Self;
@@ -280,6 +287,7 @@ macro_rules! peripheral_reset_and_enable_control_generator {
             impl $p {
                 /// Set Low Power Mode for peripheral
                 #[allow(clippy::return_self_not_must_use)]
+                // Allow return_self_not_must_use for optional convenient chaining.
                 pub fn low_power(self, lpm: LowPowerMode) -> Self {
                     // unsafe: Owned exclusive access to this bitfield
                     interrupt::free(|_| {
@@ -346,6 +354,7 @@ macro_rules! peripheral_reset_and_enable_control_generator {
             impl $p {
                 $(      // Individual kernel clocks
                     #[inline(always)]
+                    // Allow return_self_not_must_use for optional convenient chaining.
                     #[allow(clippy::return_self_not_must_use)]
                     /// Modify the kernel clock for
                     #[doc=$clk_doc "."]

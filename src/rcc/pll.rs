@@ -47,7 +47,10 @@ impl Default for PllConfig {
 ///
 macro_rules! vco_output_divider_setup {
     ($output: ident, $vco_min: ident, $vco_max: ident $(,$pll1_p:ident)*) => {{
-        // Macro-based selection
+        // Macro-based selection: `match true { $( true => … )* _ => … }` includes the PLL1 arm
+        // only when `$pll1_p` is passed to the macro; otherwise only the `_` arm remains.
+        // Clippy::match_bool targets human-written bool dispatch; this is structural routing
+        // in generated code, not a boolean that should be turned into `if` / `else`.
         #[allow(clippy::match_bool)]
         let pll_x_p = match true {
             $(

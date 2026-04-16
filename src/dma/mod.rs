@@ -116,6 +116,8 @@ use traits::MasterStream;
 mod macros;
 
 // Note: In the future, it may make sense to restructure the DMA module.
+// `module_inception`: outer `dma` is the HAL DMA subsystem; inner `dma` is DMA1/DMA2 only.
+// Allow module inception in order to mirror naming in reference manual.
 #[allow(clippy::module_inception)]
 pub mod dma; // DMA1 and DMA2
 
