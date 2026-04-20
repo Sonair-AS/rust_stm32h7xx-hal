@@ -35,7 +35,7 @@ cortex-m = { git = "https://github.com/Sonair-AS/cortex-m.git", branch = "certif
     "certified_subset",
 ] }
 defmt = { version = ">=0.2.0,<0.4", optional = true }
-stm32h7 = { git = "https://github.com/Sonair-AS/stm32h7-pac.git", default-features = false }
+stm32h7 = { git = "https://github.com/Sonair-AS/stm32h7-pac.git", branch = "feature_gating_stm32h743v", default-features = false }
 void = { git = "https://github.com/Sonair-AS/rust-void.git", branch = "certified_subset", default-features = false }
 cast = { git = "https://github.com/Sonair-AS/cast.rs.git", branch = "certified_subset", default-features = false }
 nb = { git = "https://github.com/Sonair-AS/nb.git", branch = "certified_subset" }
